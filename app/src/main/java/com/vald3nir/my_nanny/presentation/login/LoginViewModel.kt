@@ -6,8 +6,8 @@ import com.vald3nir.my_nanny.R
 import com.vald3nir.my_nanny.common.core.BaseViewModel
 import com.vald3nir.my_nanny.common.validations.isEmailValid
 import com.vald3nir.my_nanny.common.validations.isPasswordValid
-import com.vald3nir.my_nanny.domain.AuthUseCase
-import com.vald3nir.my_nanny.domain.ScreenNavigation
+import com.vald3nir.my_nanny.domain.use_cases.auth.AuthUseCase
+import com.vald3nir.my_nanny.domain.navigation.ScreenNavigation
 
 class LoginViewModel(
     private val screenNavigation: ScreenNavigation,
@@ -22,11 +22,16 @@ class LoginViewModel(
     }
 
     fun login(email: String, password: String) {
-        authUseCase.login(appView = view, email = email, password = password, onSuccess = {
-            screenNavigation.redirectToDashboard(view)
-        }, onError = {
-            view?.showMessage(it?.message)
-        })
+        view?.showLoading(true)
+        authUseCase.login(appView = view, email = email, password = password,
+            onSuccess = {
+                view?.showLoading(false)
+                screenNavigation.redirectToHome(view)
+            }, onError = {
+                view?.showLoading(false)
+                view?.showMessage(it?.message)
+            }
+        )
     }
 
     fun loginDataChanged(username: String, password: String) {
